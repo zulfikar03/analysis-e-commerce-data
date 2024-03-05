@@ -3,13 +3,13 @@ import streamlit as st
 import seaborn as sns
 import pandas as pd
 
-orders_df = pd.read_csv("orders_dataset.csv")
-order_items_df = pd.read_csv("order_items.csv")
-products_df = pd.read_csv("products_dataset.csv")
-order_payments_df = pd.read_csv("order_payments_dataset.csv")
-order_reviews_df = pd.read_csv("order_reviews_dataset.csv")
-customers_df = pd.read_csv("customers_dataset.csv")
-product_category_df = pd.read_csv("product_category_name_translation.csv")
+orders_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/orders_dataset.csv")
+order_items_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/order_items_dataset.csv")
+products_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/products_dataset.csv")
+order_payments_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/order_payments_dataset.csv")
+order_reviews_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/order_reviews_dataset.csv")
+customers_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/customers_dataset.csv")
+product_category_df = pd.read_csv("https://raw.githubusercontent.com/zulfikar03/analysis-e-commerce-data/main/product_category_name_translation.csv")
 
 all_df = orders_df.merge(order_items_df, on='order_id', how='left')
 all_df = all_df.merge(products_df, on='product_id', how='inner')
@@ -35,14 +35,22 @@ def create_top_order(all_df):
     return top_category_df
 
 def create_order_time_to_time(all_df):
+    all_df["order_purchase_timestamp"] = pd.to_datetime(all_df["order_purchase_timestamp"])
+    all_df["month_year"] =  all_df['order_purchase_timestamp'].dt.strftime('%Y-%m')
     order_per_month = all_df.groupby(by="month_year").count()[["order_id"]]
     order_per_month = order_per_month.iloc[:-1]
     order_per_month.rename(columns={"order_id":"order_count"}, inplace=True)
     return order_per_month
 
 def create_revenue_time_to_time(all_df):
-    monthly_orders_df = all_df.groupby(by="month_year").sum()[['payment_value']]
+    monthly_orders_df = all_df.resample(rule='ME', on='order_purchase_timestamp').agg({
+    "order_id": "nunique",
+    "payment_value": "sum"
+    })
+    monthly_orders_df.index = monthly_orders_df.index.strftime('%Y-%m')
+    monthly_orders_df = monthly_orders_df.reset_index()
     monthly_orders_df.rename(columns={
+        "order_id": "order_count",
         "payment_value": "revenue"
     }, inplace=True)
     return monthly_orders_df
@@ -69,6 +77,7 @@ def create_rfm_df(all_df):
  
     rfm_df.drop("max_order_timestamp", axis=1, inplace=True)
     return rfm_df
+
 
 #all_df = pd.read_csv("semua_data.csv")
 
