@@ -43,7 +43,7 @@ def create_order_time_to_time(all_df):
     return order_per_month
 
 def create_revenue_time_to_time(all_df):
-    monthly_orders_df = all_df.resample(rule='ME', on='order_purchase_timestamp').agg({
+    monthly_orders_df = all_df.resample(rule='M', on='order_purchase_timestamp').agg({
     "order_id": "nunique",
     "payment_value": "sum"
     })
