@@ -3,6 +3,21 @@ import streamlit as st
 import seaborn as sns
 import pandas as pd
 
+orders_df = pd.read_csv("orders_dataset.csv")
+order_items_df = pd.read_csv("order_items.csv")
+products_df = pd.read_csv("products_dataset.csv")
+order_payments_df = pd.read_csv("order_payments_dataset.csv")
+order_reviews_df = pd.read_csv("order_reviews_dataset.csv")
+customers_df = pd.read_csv("customers_dataset.csv")
+product_category_df = pd.read_csv("product_category_name_translation.csv")
+
+all_df = orders_df.merge(order_items_df, on='order_id', how='left')
+all_df = all_df.merge(products_df, on='product_id', how='inner')
+all_df = all_df.merge(order_payments_df, on='order_id', how = 'left')
+all_df = all_df.merge(order_reviews_df, on='order_id', how='left')
+all_df = all_df.merge(customers_df, on='customer_id', how='inner')
+all_df = all_df.merge(product_category_df, on='product_category_name', how='inner')
+
 def set_custom_palette(series, max_color = 'turquoise', other_color = 'lightgrey'):
     max_val = series.max()
     pal = []
@@ -55,7 +70,7 @@ def create_rfm_df(all_df):
     rfm_df.drop("max_order_timestamp", axis=1, inplace=True)
     return rfm_df
 
-all_df = pd.read_csv("semua_data.csv")
+#all_df = pd.read_csv("semua_data.csv")
 
 st.title("Dashboard E-Commerce Brazil")
 tab1,tab2 = st.tabs(["Analisis Biasa", "RFM Analisis"])
