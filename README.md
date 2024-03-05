@@ -2,8 +2,8 @@
 
 ## Setup environment
 ```
-conda create --name main-ds python=3.9
-conda activate main-ds
+conda create --name  e-commerce-brazzilian python=3.11
+conda activate  e-commerce-brazzilian
 pip install numpy pandas scipy matplotlib seaborn jupyter streamlit 
 ```
 
